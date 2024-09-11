@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Solar Inverter Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Solar Inverter Data</h1>
+    
+    <div id="data-container">
+        <p id="error-message" class="error"></p>
+        <h2>Entered Solar Inverter Data</h2>
+        <table id="data-table" style="display: none;">
+            <tr><th>Timestamp</th><td id="timestamp"></td></tr>
+            <tr><th>Voltage (V)</th><td id="voltage"></td></tr>
+            <tr><th>Current (A)</th><td id="current"></td></tr>
+            <tr><th>Power (W)</th><td id="power"></td></tr>
+            <tr><th>Weather Temperature in Cape Town (°C)</th><td id="temperature"></td></tr>
+            <tr><th>Total Energy Output (kWh)</th><td id="total-energy-output"></td></tr>
+        </table>
+    </div>
+
+    <script>
+        async function fetchData() {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/api/data');
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
+                
+                if (data) {
+                    document.getElementById('timestamp').textContent = data.timestamp;
+                    document.getElementById('voltage').textContent = data.voltage;
+                    document.getElementById('current').textContent = data.current;
+                    document.getElementById('power').textContent = data.power;
+                    document.getElementById('temperature').textContent = data.temperature;
+                    document.getElementById('total-energy-output').textContent = data.total_energy_output_kwh + ' kWh';
+                    
+                    document.getElementById('data-table').style.display = 'table';
+                    document.getElementById('error-message').textContent = '';
+                }
+            } catch (error) {
+                document.getElementById('error-message').textContent = 'Failed to fetch data: ' + error.message;
+            }
+        }
+
+        // Fetch data on page load
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
